@@ -1,18 +1,34 @@
-const { User } = require('./user.model');
 const { Task } = require('../tasks/task.model');
+const { User } = require('./user.model');
 
-const getAll = () => User.find({});
+const getAll = async () => {
+  const users = await User.find({});
 
-const getUser = (id) => User.findById(id);
+  return users;
+};
 
-const createUser = (user) => new User(user)?.save();
+const createUser = async user => {
+  const createdUser = await new User(user);
+  await createdUser.save();
 
-const updateUser = (id, updatedUser) =>
-  User.findOneAndUpdate({ _id: id }, updatedUser, {
-    new: true,
+  return createdUser;
+};
+
+const getUser = async id => {
+  const user = await User.findById(id);
+
+  return user;
+};
+
+const updateUser = async (id, updatedUser) => {
+  const user = await User.findOneAndUpdate({ _id: id }, updatedUser, {
+    new: true
   });
 
-const deleteUser = async (id) => {
+  return user;
+};
+
+const deleteUser = async id => {
   await Task.updateMany({ userId: id }, { userId: null });
   await User.findByIdAndDelete(id);
 
@@ -24,5 +40,5 @@ module.exports = {
   getUser,
   createUser,
   updateUser,
-  deleteUser,
+  deleteUser
 };
