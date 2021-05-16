@@ -1,44 +1,15 @@
-const { Task } = require('../tasks/task.model');
-const { User } = require('./user.model');
+const DB = require('../../common/inMemoryDb');
 
-const getAll = async () => {
-  const users = await User.find({});
+const getAll = async () => DB.getAllUsers();
 
-  return users;
-};
-
-const createUser = async user => {
-  const createdUser = await new User(user);
-  await createdUser.save();
-
-  return createdUser;
-};
-
-const getUser = async id => {
-  const user = await User.findById(id);
-
+const getOne = async id => {
+  const user = await DB.getUser(id);
+  if (!user) throw new Error(`The user with id: ${id} was not found`);
   return user;
 };
 
-const updateUser = async (id, updatedUser) => {
-  const user = await User.findOneAndUpdate({ _id: id }, updatedUser, {
-    new: true
-  });
+const update = async user => DB.updateUser(user);
+const create = async user => DB.createUser(user);
+const remove = async id => DB.removeUser(id);
 
-  return user;
-};
-
-const deleteUser = async id => {
-  await Task.updateMany({ userId: id }, { userId: null });
-  await User.findByIdAndDelete(id);
-
-  return 'User and user tasks have been deleted';
-};
-
-module.exports = {
-  getAll,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser
-};
+module.exports = { getAll, getOne, create, update, remove };
